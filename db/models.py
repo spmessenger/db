@@ -34,4 +34,4 @@ class Participant(Base):
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
 
-    chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', userlist=False, foreign_keys=[chat_id])
+    chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
