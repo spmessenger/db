@@ -41,7 +41,7 @@ def asession_factory(func):
 def session_factory(func):
     def wrapper(*args, **kwargs):
         if kwargs.get('session') is None:
-            with aget_session() as session:
+            with get_session() as session:
                 kwargs['session'] = session
                 return func(*args, **kwargs)
         else:
