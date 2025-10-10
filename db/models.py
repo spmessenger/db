@@ -35,7 +35,7 @@ class Participant(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    type: Mapped[str] = mapped_column(String(16), nullable=False)
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
     draft: Mapped[str | None] = mapped_column(String(MESSAGE_LEN), nullable=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
