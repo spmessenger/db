@@ -3,6 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 
+MESSAGE_LEN = 2048
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -25,7 +27,7 @@ class Message(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
-    content: Mapped[str] = mapped_column(String(2048), nullable=False)
+    content: Mapped[str] = mapped_column(String(MESSAGE_LEN), nullable=False)
 
 
 class Participant(Base):
@@ -33,6 +35,6 @@ class Participant(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    draft: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    draft: Mapped[str | None] = mapped_column(String(MESSAGE_LEN), nullable=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
