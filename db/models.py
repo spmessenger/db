@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Numeric, String, JSON, ForeignKey, Table
+from sqlalchemy import Column, Integer, Numeric, String, JSON, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .misc.defaults import default_timestamp
@@ -58,5 +58,6 @@ class Participant(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     role: Mapped[str] = mapped_column(String(16), nullable=False)
     draft: Mapped[str | None] = mapped_column(String(MESSAGE_LEN), nullable=True)
+    pin_position: Mapped[int] = mapped_column(Integer, default=0)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
