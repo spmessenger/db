@@ -1,4 +1,4 @@
-from sqlalchemy import and_, or_, ColumnElement
+from sqlalchemy import and_, false, or_, ColumnElement
 from .utils import is_right_hand_clause_null
 
 
@@ -6,7 +6,7 @@ class cond_seq:
     def __init__(self, ignore_null_right_hand: bool = True):
         self._need_ignore_null_right_hand = ignore_null_right_hand
         self._and_clauses: list[ColumnElement] = []
-        self._or_clauses: list[ColumnElement] = []
+        self._or_clauses: list[ColumnElement] = [false()]
 
     def and_(self, clause) -> 'cond_seq':
         if self._need_ignore_null_right_hand and is_right_hand_clause_null(clause):
