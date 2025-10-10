@@ -28,8 +28,17 @@ class Chat(Base):
 
     type: Mapped[str] = mapped_column(String(16))
     title: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    last_message: Mapped['Message'] = relationship(
+        'Message',
+        secondary=chat_last_message_association_table,
+        uselist=False,
+        viewonly=True,
+    )
 
     participants: Mapped[list['Participant']] = relationship('Participant', back_populates='chat')
+    messages: Mapped[list['Message']] = relationship(
+        'Message', back_populates='chat', foreign_keys='Message.chat_id'
+    )
 
 
 class Message(Base):
@@ -39,6 +48,7 @@ class Message(Base):
     participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
     content: Mapped[str] = mapped_column(String(MESSAGE_LEN), nullable=False)
     created_at_timestamp: Mapped[float | None] = mapped_column(Numeric(16, 4), nullable=False, default=default_timestamp)
+    chat: Mapped['Chat'] = relationship('Chat', back_populates='messages', foreign_keys=[chat_id], uselist=False)
 
 
 class Participant(Base):
