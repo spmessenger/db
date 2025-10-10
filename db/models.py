@@ -24,7 +24,7 @@ class Message(Base):
     __tablename__ = 'messages'
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
     content: Mapped[str] = mapped_column(String(2048), nullable=False)
 
 
