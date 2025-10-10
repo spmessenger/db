@@ -25,7 +25,7 @@ class Message(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    content: Mapped[str] = mapped_column(String(256), nullable=False)
+    content: Mapped[str] = mapped_column(String(2048), nullable=False)
 
 
 class Participant(Base):
@@ -33,5 +33,6 @@ class Participant(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    draft: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
