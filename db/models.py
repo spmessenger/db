@@ -62,3 +62,4 @@ class Participant(Base):
     chat_visible: Mapped[bool] = mapped_column(Boolean, default=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
+    user: Mapped['User'] = relationship('User', uselist=False, foreign_keys=[user_id])
