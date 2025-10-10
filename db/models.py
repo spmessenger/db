@@ -1,9 +1,11 @@
-from sqlalchemy import String, JSON, ForeignKey
+from sqlalchemy import Numeric, String, JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
+from .misc.defaults import default_timestamp
 
 
 MESSAGE_LEN = 2048
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -28,6 +30,7 @@ class Message(Base):
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
     content: Mapped[str] = mapped_column(String(MESSAGE_LEN), nullable=False)
+    created_at_timestamp: Mapped[float | None] = mapped_column(Numeric(16, 4), nullable=False, default=default_timestamp)
 
 
 class Participant(Base):
