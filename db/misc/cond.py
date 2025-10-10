@@ -26,8 +26,8 @@ class cond_seq:
 
     @property
     def and_clauses(self) -> ColumnElement:
-        return and_(*self._and_clauses) if len(self._and_clauses) > 1 else self._and_clauses[0]
+        return and_(*self._and_clauses) if len(self._and_clauses) != 1 else self._and_clauses[0]
 
     @property
     def or_clauses(self) -> ColumnElement:
-        return or_(*self._or_clauses) if len(self._or_clauses) > 1 else self._or_clauses[0]
+        return or_(*self._or_clauses) if len(self._or_clauses) != 1 else self._or_clauses[0]
