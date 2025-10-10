@@ -1,4 +1,4 @@
-from sqlalchemy import Numeric, String, JSON, ForeignKey
+from sqlalchemy import Column, Numeric, String, JSON, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .misc.defaults import default_timestamp
@@ -13,6 +13,14 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(16), unique=True)
     hashed_password: Mapped[str] = mapped_column(String(128))
     refresh_tokens: Mapped[list[str]] = mapped_column(JSON, default=list)
+
+
+chat_last_message_association_table = Table(
+    'chat_last_messages',
+    Base.metadata,
+    Column('chat_id', ForeignKey('chats.id'), nullable=False, unique=True),
+    Column('message_id', ForeignKey('messages.id'), nullable=False, unique=True),
+)
 
 
 class Chat(Base):
