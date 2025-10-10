@@ -1,4 +1,4 @@
-from sqlalchemy import and_, false, or_, ColumnElement
+from sqlalchemy import and_, or_, ColumnElement
 from .utils import is_right_hand_clause_null
 
 
@@ -21,13 +21,30 @@ class cond_seq:
         return self
 
     @property
-    def clauses(self) -> tuple[ColumnElement[bool], ColumnElement[bool]]:
+    def clause(self) -> ColumnElement | ColumnElement[bool] | bool:
+        """Returns a single combined clause for use in where()"""
+        and_clause = and_(*self._and_clauses) if self._and_clauses else True
+        or_clause = or_(*self._or_clauses) if self._or_clauses else False
+
+        if self._and_clauses and self._or_clauses:
+            return and_(and_clause, or_clause)
+        elif self._and_clauses:
+            return and_clause
+        elif self._or_clauses:
+            return or_clause
+        else:
+            return True  # No conditions
+
+    # Remove the old clauses property or keep it for backward compatibility
+    @property
+    def clauses(self) -> tuple[ColumnElement[bool] | bool, ColumnElement[bool] | bool]:
+        """Returns tuple of (and_clauses, or_clauses) - use .clause for where()"""
         return self.and_clauses, self.or_clauses
 
     @property
-    def and_clauses(self) -> ColumnElement:
-        return and_(*self._and_clauses) if len(self._and_clauses) != 1 else self._and_clauses[0]
+    def and_clauses(self) -> ColumnElement | bool:
+        return and_(*self._and_clauses) if len(self._and_clauses) > 1 else self._and_clauses[0] if self._and_clauses else True
 
     @property
-    def or_clauses(self) -> ColumnElement:
-        return or_(*self._or_clauses) if len(self._or_clauses) != 1 else self._or_clauses[0]
+    def or_clauses(self) -> ColumnElement | bool:
+        return or_(*self._or_clauses) if len(self._or_clauses) > 1 else self._or_clauses[0] if self._or_clauses else False
