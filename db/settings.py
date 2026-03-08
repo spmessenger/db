@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     def sqlalchemy_database_url(self):
         match self.DB_TYPE:
             case DatabaseTypeEnum.POSTGRESQL:
-                return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORt}/{self.DB_NAME}'
+                return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
             case DatabaseTypeEnum.IN_MEMORY:
                 return 'sqlite+aiosqlite:///:memory:'
             case _:

@@ -1,6 +1,10 @@
-from sqlalchemy import String, JSON, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, Numeric, String, JSON, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
+from .misc.defaults import default_timestamp
+
+
+MESSAGE_LEN = 2048
 
 
 class User(Base):
@@ -11,21 +15,40 @@ class User(Base):
     refresh_tokens: Mapped[list[str]] = mapped_column(JSON, default=list)
 
 
+chat_last_message_association_table = Table(
+    'chat_last_messages',
+    Base.metadata,
+    Column('chat_id', ForeignKey('chats.id'), nullable=False, unique=True),
+    Column('message_id', ForeignKey('messages.id'), nullable=False, unique=True),
+)
+
+
 class Chat(Base):
     __tablename__ = 'chats'
 
     type: Mapped[str] = mapped_column(String(16))
     title: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    last_message: Mapped['Message'] = relationship(
+        'Message',
+        secondary=chat_last_message_association_table,
+        uselist=False,
+        viewonly=True,
+    )
 
     participants: Mapped[list['Participant']] = relationship('Participant', back_populates='chat')
+    messages: Mapped[list['Message']] = relationship(
+        'Message', back_populates='chat', foreign_keys='Message.chat_id'
+    )
 
 
 class Message(Base):
     __tablename__ = 'messages'
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    content: Mapped[str] = mapped_column(String(256), nullable=False)
+    participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
+    content: Mapped[str] = mapped_column(String(MESSAGE_LEN), nullable=False)
+    created_at_timestamp: Mapped[float | None] = mapped_column(Numeric(16, 4), nullable=False, default=default_timestamp)
+    chat: Mapped['Chat'] = relationship('Chat', back_populates='messages', foreign_keys=[chat_id], uselist=False)
 
 
 class Participant(Base):
@@ -33,5 +56,10 @@ class Participant(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
+    draft: Mapped[str | None] = mapped_column(String(MESSAGE_LEN), nullable=True)
+    pin_position: Mapped[int] = mapped_column(Integer, default=0)
+    chat_visible: Mapped[bool] = mapped_column(Boolean, default=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
+    user: Mapped['User'] = relationship('User', uselist=False, foreign_keys=[user_id])
