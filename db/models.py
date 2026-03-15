@@ -28,6 +28,7 @@ class Chat(Base):
 
     type: Mapped[str] = mapped_column(String(16))
     title: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
     last_message: Mapped['Message'] = relationship(
         'Message',
         secondary=chat_last_message_association_table,
