@@ -27,3 +27,13 @@ def ensure_tables_exist():
         missing = ', '.join(missing_tables)
         raise RuntimeError(
             f'Database schema is incomplete. Missing tables: {missing}')
+
+    inspector = inspect(engine)
+    for table_name, table in Base.metadata.tables.items():
+        existing_columns = {column['name'] for column in inspector.get_columns(table_name)}
+        expected_columns = {column.name for column in table.columns}
+        missing_columns = sorted(expected_columns - existing_columns)
+        if missing_columns:
+            missing = ', '.join(f'{table_name}.{column}' for column in missing_columns)
+            raise RuntimeError(
+                f'Database schema is incomplete. Missing columns: {missing}')
