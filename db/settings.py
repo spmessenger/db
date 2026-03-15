@@ -9,7 +9,7 @@ class DatabaseTypeEnum(StrEnum):
 
 
 class Settings(BaseSettings):
-    DB_TYPE: DatabaseTypeEnum = DatabaseTypeEnum.IN_MEMORY
+    DB_TYPE: DatabaseTypeEnum = DatabaseTypeEnum.POSTGRESQL
 
     DB_NAME: str = 'messenger'
     DB_USER: str = 'postgres'

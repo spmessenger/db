@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, Numeric, String, JSON, ForeignKey, Table
+from sqlalchemy import Boolean, Column, Integer, Numeric, String, JSON, ForeignKey, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .misc.defaults import default_timestamp
@@ -28,7 +28,7 @@ class Chat(Base):
 
     type: Mapped[str] = mapped_column(String(16))
     title: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_message: Mapped['Message'] = relationship(
         'Message',
         secondary=chat_last_message_association_table,
