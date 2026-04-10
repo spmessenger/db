@@ -22,6 +22,13 @@ chat_last_message_association_table = Table(
     Column('message_id', ForeignKey('messages.id'), nullable=False, unique=True),
 )
 
+chat_group_chat_association_table = Table(
+    'chat_group_chats',
+    Base.metadata,
+    Column('group_id', ForeignKey('chat_groups.id'), nullable=False),
+    Column('chat_id', ForeignKey('chats.id'), nullable=False),
+)
+
 
 class Chat(Base):
     __tablename__ = 'chats'
@@ -61,6 +68,20 @@ class Participant(Base):
     draft: Mapped[str | None] = mapped_column(String(MESSAGE_LEN), nullable=True)
     pin_position: Mapped[int] = mapped_column(Integer, default=0)
     chat_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_read_message_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
     user: Mapped['User'] = relationship('User', uselist=False, foreign_keys=[user_id])
+
+
+class ChatGroup(Base):
+    __tablename__ = 'chat_groups'
+
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    title: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    chats: Mapped[list['Chat']] = relationship(
+        'Chat',
+        secondary=chat_group_chat_association_table,
+        uselist=True,
+    )
