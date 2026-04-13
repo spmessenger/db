@@ -3,6 +3,7 @@ from contextlib import contextmanager, asynccontextmanager
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.exc import SQLAlchemyError
 from .settings import settings
 
 
@@ -54,7 +55,7 @@ def ping_connection():
         with engine.connect() as con:
             con.execute(text('SELECT 1'))
             return True
-    except Exception:
+    except SQLAlchemyError:
         return False
 
 
@@ -63,5 +64,5 @@ async def aping_connection():
         async with aengine.connect() as con:
             await con.execute(text('SELECT 1'))
             return True
-    except Exception:
+    except SQLAlchemyError:
         return False

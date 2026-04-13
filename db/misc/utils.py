@@ -30,5 +30,5 @@ def is_empty(seq: Sequence) -> bool:
 def errorless_pop(obj, key):
     try:
         return obj.pop(key)
-    except Exception:
+    except (AttributeError, KeyError, TypeError):
         return None

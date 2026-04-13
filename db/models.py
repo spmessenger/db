@@ -13,6 +13,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(16), unique=True)
     hashed_password: Mapped[str] = mapped_column(String(128))
     refresh_tokens: Mapped[list[str]] = mapped_column(JSON, default=list)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 chat_last_message_association_table = Table(
