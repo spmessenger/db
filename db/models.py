@@ -55,6 +55,7 @@ class Message(Base):
 
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
     participant_id: Mapped[int] = mapped_column(ForeignKey('participants.id'))
+    reference_message_id: Mapped[int | None] = mapped_column(ForeignKey('messages.id'), nullable=True)
     content: Mapped[str] = mapped_column(String(MESSAGE_LEN), nullable=False)
     created_at_timestamp: Mapped[float | None] = mapped_column(Numeric(16, 4), nullable=False, default=default_timestamp)
     chat: Mapped['Chat'] = relationship('Chat', back_populates='messages', foreign_keys=[chat_id], uselist=False)
