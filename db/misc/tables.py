@@ -4,6 +4,12 @@ from ..base import Base
 from ..session import engine
 
 
+def _inspected_name(entry) -> str | None:
+    if isinstance(entry, dict):
+        return entry.get("name")
+    return getattr(entry, "name", None)
+
+
 def create_tables() -> list[str]:
     Base.metadata.create_all(engine)
 
@@ -31,8 +37,11 @@ def get_missing_columns() -> list[str]:
         if table_name not in existing_tables:
             continue
 
-        existing_columns = {column['name']
-                            for column in inspector.get_columns(table_name)}
+        existing_columns = {
+            name
+            for name in (_inspected_name(column) for column in inspector.get_columns(table_name))
+            if name
+        }
         expected_columns = {column.name for column in table.columns}
         missing_columns.extend(
             f'{table_name}.{column_name}'
@@ -53,8 +62,11 @@ def create_missing_columns() -> list[str]:
             if table_name not in existing_tables:
                 continue
 
-            existing_columns = {column['name']
-                                for column in inspector.get_columns(table_name)}
+            existing_columns = {
+                name
+                for name in (_inspected_name(column) for column in inspector.get_columns(table_name))
+                if name
+            }
             for column_name in sorted(column.name for column in table.columns if column.name not in existing_columns):
                 column = table.columns[column_name]
                 compiled_column = str(CreateColumn(

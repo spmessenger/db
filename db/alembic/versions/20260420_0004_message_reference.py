@@ -16,16 +16,30 @@ branch_labels = None
 depends_on = None
 
 
+def _inspected_name(entry) -> str | None:
+    if isinstance(entry, dict):
+        return entry.get("name")
+    return getattr(entry, "name", None)
+
+
 def upgrade() -> None:
     bind = op.get_bind()
     inspector = sa.inspect(bind)
-    columns = {column["name"] for column in inspector.get_columns("messages")}
+    columns = {
+        name
+        for name in (_inspected_name(column) for column in inspector.get_columns("messages"))
+        if name
+    }
     if "reference_message_id" not in columns:
         op.add_column(
             "messages",
             sa.Column("reference_message_id", sa.Integer(), nullable=True),
         )
-    indexes = {index["name"] for index in inspector.get_indexes("messages")}
+    indexes = {
+        name
+        for name in (_inspected_name(index) for index in inspector.get_indexes("messages"))
+        if name
+    }
     if "ix_messages_reference_message_id" not in indexes:
         op.create_index(
             "ix_messages_reference_message_id",
@@ -38,10 +52,18 @@ def upgrade() -> None:
 def downgrade() -> None:
     bind = op.get_bind()
     inspector = sa.inspect(bind)
-    indexes = {index["name"] for index in inspector.get_indexes("messages")}
+    indexes = {
+        name
+        for name in (_inspected_name(index) for index in inspector.get_indexes("messages"))
+        if name
+    }
     if "ix_messages_reference_message_id" in indexes:
         op.drop_index("ix_messages_reference_message_id", table_name="messages")
 
-    columns = {column["name"] for column in inspector.get_columns("messages")}
+    columns = {
+        name
+        for name in (_inspected_name(column) for column in inspector.get_columns("messages"))
+        if name
+    }
     if "reference_message_id" in columns:
         op.drop_column("messages", "reference_message_id")
