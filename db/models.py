@@ -14,6 +14,8 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(128))
     refresh_tokens: Mapped[list[str]] = mapped_column(JSON, default=list)
     avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    subscription_tier: Mapped[str] = mapped_column(String(16), nullable=False, default='free')
+    youtube_assisted_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 
 chat_last_message_association_table = Table(
