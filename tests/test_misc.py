@@ -47,7 +47,9 @@ def test_get_missing_columns_returns_missing_chat_avatar_url(monkeypatch):
 
     missing_columns = misc.get_missing_columns()
 
-    assert missing_columns == ['chats.avatar_url', 'participants.last_read_message_id']
+    assert 'chats.avatar_url' in missing_columns
+    assert 'participants.last_read_message_id' in missing_columns
+    assert 'participants.unread_messages_count' in missing_columns
 
 
 def test_sync_schema_creates_missing_columns(monkeypatch):

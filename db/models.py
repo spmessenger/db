@@ -80,6 +80,7 @@ class Participant(Base):
     pin_position: Mapped[int] = mapped_column(Integer, default=0)
     chat_visible: Mapped[bool] = mapped_column(Boolean, default=True)
     last_read_message_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    unread_messages_count: Mapped[int] = mapped_column(Integer, default=0)
 
     chat: Mapped['Chat'] = relationship('Chat', back_populates='participants', uselist=False, foreign_keys=[chat_id])
     user: Mapped['User'] = relationship('User', uselist=False, foreign_keys=[user_id])

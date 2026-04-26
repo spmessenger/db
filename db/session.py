@@ -4,16 +4,20 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
-from .settings import settings
+from .settings import get_settings
 
 
+settings = get_settings()
 extra_params = settings.sqlalchemy_engine_params
 
 aengine = create_async_engine(settings.sqlalchemy_database_url, **extra_params)
-engine = create_engine(settings.sync_only_sqlalchemy_database_url, **extra_params)
+engine = create_engine(
+    settings.sync_only_sqlalchemy_database_url, **extra_params)
 
-AsyncSessionLocal = async_sessionmaker(class_=AsyncSession, autocommit=False, autoflush=False, bind=aengine, expire_on_commit=False)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
+AsyncSessionLocal = async_sessionmaker(
+    class_=AsyncSession, autocommit=False, autoflush=False, bind=aengine, expire_on_commit=False)
+SessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 
 
 @asynccontextmanager

@@ -6,7 +6,8 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from db.base import Base
-from db.settings import settings
+from db.settings import get_settings
+settings = get_settings()
 
 # Ensure model metadata is registered on Base.metadata.
 import db.models  # noqa: F401
@@ -16,7 +17,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.sync_only_sqlalchemy_database_url)
+config.set_main_option(
+    "sqlalchemy.url", settings.sync_only_sqlalchemy_database_url)
 
 target_metadata = Base.metadata
 
