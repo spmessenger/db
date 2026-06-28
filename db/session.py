@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import AsyncGenerator, Generator
 from contextlib import contextmanager, asynccontextmanager
 from sqlalchemy import create_engine, text
@@ -33,24 +34,30 @@ def get_session() -> Generator[Session, None, None]:
 
 
 def asession_factory(func):
-    async def wrapper(*args, **kwargs):
+    @wraps(func)
+    async def wrapper(self, *args, **kwargs):
+        if getattr(self, '_session', None) is not None:
+            kwargs['session'] = self._session
+            return await func(self, *args, **kwargs)
         if kwargs.get('session') is None:
             async with aget_session() as session:
                 kwargs['session'] = session
-                return await func(*args, **kwargs)
-        else:
-            return await func(*args, **kwargs)
+                return await func(self, *args, **kwargs)
+        return await func(self, *args, **kwargs)
     return wrapper
 
 
 def session_factory(func):
-    def wrapper(*args, **kwargs):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if getattr(self, '_session', None) is not None:
+            kwargs['session'] = self._session
+            return func(self, *args, **kwargs)
         if kwargs.get('session') is None:
             with get_session() as session:
                 kwargs['session'] = session
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
+                return func(self, *args, **kwargs)
+        return func(self, *args, **kwargs)
     return wrapper
 
 

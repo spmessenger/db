@@ -85,7 +85,7 @@ class Message(Base):
     chat: Mapped['Chat'] = relationship(
         'Chat', back_populates='messages', foreign_keys=[chat_id], uselist=False)
     metadata_: Mapped[dict] = mapped_column(
-        'metadata', MutableDict.as_mutable(JSONB), default=dict, nullable=False)
+        'metadata', MutableDict.as_mutable(JSON().with_variant(JSONB, 'postgresql')), default=dict, nullable=False)
 
 
 class Participant(Base):
