@@ -1,4 +1,6 @@
-from sqlalchemy import Boolean, Column, Integer, Numeric, String, JSON, ForeignKey, Table, Text
+from __future__ import annotations
+
+from sqlalchemy import Boolean, Column, Integer, Numeric, String, JSON, ForeignKey, Table, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects.postgresql import JSONB
@@ -86,6 +88,41 @@ class Message(Base):
         'Chat', back_populates='messages', foreign_keys=[chat_id], uselist=False)
     metadata_: Mapped[dict] = mapped_column(
         'metadata', MutableDict.as_mutable(JSON().with_variant(JSONB, 'postgresql')), default=dict, nullable=False)
+    reply: Mapped[Reply | None] = relationship(
+        'Reply',
+        back_populates='replying_msg',
+        foreign_keys='Reply.replying_msg_id',
+        uselist=False,
+        cascade='all, delete-orphan',
+    )
+
+    @property
+    def reply_to(self) -> Message | None:
+        if self.reply is None:
+            return None
+        return self.reply.reply_to_msg
+
+
+class Reply(Base):
+    __tablename__ = 'replies'
+    __table_args__ = (
+        UniqueConstraint('replying_msg_id', name='uq_replies_replying_msg_id'),
+    )
+
+    replying_msg_id: Mapped[int] = mapped_column(ForeignKey('messages.id'))
+    reply_to_msg_id: Mapped[int] = mapped_column(ForeignKey('messages.id'))
+
+    replying_msg: Mapped[Message] = relationship(
+        'Message',
+        back_populates='reply',
+        foreign_keys=[replying_msg_id],
+        uselist=False,
+    )
+    reply_to_msg: Mapped[Message] = relationship(
+        'Message',
+        foreign_keys=[reply_to_msg_id],
+        uselist=False,
+    )
 
 
 class Participant(Base):
